@@ -34,7 +34,13 @@ def hs(sock):
         k=None
         for l in d.decode("utf-8","replace").split("\r\n"):
             if l.lower().startswith("sec-websocket-key:"): k=l.split(":",1)[1].strip(); break
-        if not k: return False
+        if not k:
+            try:
+                hd=d.decode("utf-8","replace")
+                if "GET / " in hd or "HEAD / " in hd:
+                    sock.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\nContent-Type: text/plain\r\n\r\nOK")
+            except:pass
+            return False
         ak=base64.b64encode(hashlib.sha1(k.encode()+WS_MAGIC).digest()).decode()
         sock.sendall(f"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {ak}\r\n\r\n".encode())
         sock.settimeout(None); return True
