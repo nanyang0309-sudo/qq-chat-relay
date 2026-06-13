@@ -1,0 +1,10 @@
+﻿services:
+  - type: web
+    name: qq-chat-relay
+    env: python
+    buildCommand: ''
+    startCommand: python relay_server.py
+    healthCheckPath: /
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 'true'
